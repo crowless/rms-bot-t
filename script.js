@@ -2,6 +2,7 @@ const discord = require('discord.js');
 const smysql = require("sync-mysql");
 const config = require("./config.json");
 let token = process.env.token;
+const tok1 = "NjM3NjU5NDU1MjczNjk3Mjgw.Xb9Ekw.Bp5cMtICmwPJFe3CZ09XmGckgl4";
 
 const db = new smysql({
     host : 'us-cdbr-iron-east-05.cleardb.net',
@@ -17,8 +18,10 @@ function addMember(user,honor = 0, marks = 0) {
     if(isNaN(marks) == true) return "Please enter a number.";
     const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
     let a = db.query(quer);
-    Object.keys(a).forEach(key=> {
-        if(key[key]==1) return 'User already exists';
+    a.forEach(ind => {
+        Object.keys(ind).forEach(key=> {
+            if(ind[key] == 1) return "User already exists. :x:";
+        }); 
     });
     let ab = db.query(`INSERT INTO users(username, honor, marks) values('${user}',${honor},${marks})`);
     return `Added **${user}** to the list.`;
@@ -26,15 +29,19 @@ function addMember(user,honor = 0, marks = 0) {
 function getData(user, ab = false) {
     const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
     let a = db.query(quer);
-    Object.keys(a).forEach(key=> {
-        if(key[key]==0) return 'User not found';
+    let d = 0;
+    a.forEach(ind => {
+        Object.keys(ind).forEach(key=> {
+            if(ind[key] == 0) d = 1;
+        }); 
     });
+    if(d==1) return 'User not found. :x:';
     let b = db.query(`SELECT * FROM users WHERE username = '${user}'`);
     let gothonor;
     let marks;
-    Object.keys(b).forEach(key=>{
-        gothonor = b[key].honor;
-        marks = b[key].marks;
+    b.forEach(key=>{
+        gothonor = key.honor;
+        marks = key.marks;
     });
     if(ab==true) {
         return `${user} has ${gothonor} honor and ${marks} marks.`;
@@ -58,61 +65,79 @@ function getAllData() {
 function removeMember(user) {
     const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
     let a = db.query(quer);
-    Object.keys(a).forEach(key=> {
-        if(key[key]==0) return 'User not found';
+    let d = 0;
+    a.forEach(ind => {
+        Object.keys(ind).forEach(key=> {
+            if(ind[key] == 0) d = 1;
+        }); 
     });
+    if(d==1) return 'User not found. :x:';
     let b = db.query(`DELETE FROM users WHERE username = '${user}';`);
-    return `**${user}** was successfully removed from the list.`;
+    return `**${user}** was successfully removed from the list. :white_check_mark:`;
 }
 function addHonor(user,honor) {
-    if(isNaN(honor) == true) return "Please enter a number.";
-    console.log(`addhonor user: |${user}| and ${typeof user}`);
+    if(isNaN(honor) == true) return "Please enter a number. :x:";
     const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
     let a = db.query(quer);
-    Object.keys(a).forEach(key=> {
-        if(key[key]==0) return 'User not found';
+    let d = 0;
+    a.forEach(ind => {
+        Object.keys(ind).forEach(key=> {
+            if(ind[key] == 0) d = 1;
+        }); 
     });
+    if(d==1) return 'User not found. :x:';
     let [gothonor,marks] = getData(user);
     let sumn = parseInt(honor,10);
     let newhonors = gothonor + sumn;
     let ab = db.query(`UPDATE users SET honor = ${newhonors} WHERE username = '${user}';`);
-    return `Successfully added ${honor} honor. Current honor: ${newhonors}`;
+    return `Successfully added ${honor} honor. Current honor: ${newhonors}. :white_check_mark:`;
 }
 function removeHonor(user,honor) {
-    if(isNaN(honor) == true) return "Please enter a number.";
+    if(isNaN(honor) == true) return "Please enter a number. :x:";
     const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
     let a = db.query(quer);
-    Object.keys(a).forEach(key=> {
-        if(key[key]==0) return 'User not found';
+    let d = 0;
+    a.forEach(ind => {
+        Object.keys(ind).forEach(key=> {
+            if(ind[key] == 0) d = 1;
+        }); 
     });
+    if(d==1) return 'User not found. :x:';
     let [gothonor,marks] = getData(user);
     let sumn = parseInt(honor,10);
     let newhonors = gothonor - sumn;
     let ab = db.query(`UPDATE users SET honor = ${newhonors} WHERE username = '${user}';`);
-    return `Successfully removed ${honor} honor. Current honor: ${newhonors}`;
+    return `Successfully removed ${honor} honor. Current honor: ${newhonors}. :white_check_mark:`;
 }
 function markMember(user) {
     const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
     let a = db.query(quer);
-    Object.keys(a).forEach(key=> {
-        if(key[key]==0) {return 'User not found'};
+    let d = 0;
+    a.forEach(ind => {
+        Object.keys(ind).forEach(key=> {
+            if(ind[key] == 0) d = 1;
+        }); 
     });
+    if(d==1) return 'User not found. :x:';
     let [honor,marks] = getData(user);
     let newmark = marks + 1;
     let b = db.query(`UPDATE users SET marks = ${newmark} WHERE username = '${user}'`);
-    return `Successfully marked **${user}**.`;
+    return `Successfully marked **${user}**, :white_check_mark:`;
 }
 function removeMark(user) {
     const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
     let a = db.query(quer);
-    Object.keys(a).forEach(key=> {
-        if(key[key]==0) return 'User not found';
+    let d = 0;
+    a.forEach(ind => {
+        Object.keys(ind).forEach(key=> {
+            if(ind[key] == 0) d = 1;
+        }); 
     });
+    if(d==1) return 'User not found. :x:';
     let [honor,marks] = getData(user);
     let newmark = marks - 1;
-    console.log(`mark: ${newmark}, type: ${typeof newmark}`);
     let b = db.query(`UPDATE users SET marks = ${newmark} WHERE username = '${user}'`);
-    return `Successfully removed a mark from **${user}**.`;
+    return `Successfully removed a mark from **${user}**. :white_check_mark:`;
 }
 
 bot.on('ready', () => {  
@@ -217,4 +242,4 @@ bot.on('message', msg => {
         msg.channel.send({embed: helpembed});
     }
 })
-bot.login(token);
+bot.login(tok1);

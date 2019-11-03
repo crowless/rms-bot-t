@@ -1,6 +1,7 @@
 const discord = require('discord.js');
 const fs = require('fs');
 const config = require("./config.json")
+let token = process.env.token;
 
 const bot = new discord.Client();
 
@@ -189,4 +190,4 @@ bot.on('message', msg => {
         msg.channel.send({embed: helpembed});
     }
 })
-bot.login(config.token);
+bot.login(token);

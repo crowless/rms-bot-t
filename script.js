@@ -93,8 +93,8 @@ bot.on('ready', () => {
 })
 
 bot.on('message', msg => {
-    console.log(msg.content);
     if(!msg.member.roles.find(n => n.name === "bot access")) return;
+    if(!msg.content.startsWith('.')) return;
 
     let msgar = (msg.content).split(" ");
     let cmd = msgar[0];

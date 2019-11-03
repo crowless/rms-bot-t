@@ -16,7 +16,7 @@ function addMember(user,honor = 0, marks = 0) {
     let ab = db.query(`INSERT INTO users(username, honor, marks) values(${user},${honor},${marks})`);
     return `Added **${user}** to the list.`;
 }
-function getData(user, a = false) {
+function getData(user, ab = false) {
     const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
     let a = db.query(quer);
     for (let key in a){
@@ -29,7 +29,7 @@ function getData(user, a = false) {
         gothonor = b[key].honor;
         marks = b[key].marks;
     });
-    if(a==true) {
+    if(ab==true) {
         return `${user} has ${gothonor} honor and ${marks} marks.`;
     }
     return [gothonor,marks];

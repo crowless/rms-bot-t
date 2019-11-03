@@ -3,6 +3,13 @@ const smysql = require("sync-mysql");
 const config = require("./config.json");
 let token = process.env.token;
 
+const db = new smysql({
+    host : 'us-cdbr-iron-east-05.cleardb.net',
+    user : 'b97e35f4657d49',
+    password : 'a005e07f',
+    database : 'heroku_2c4325fb79d2ce7'
+});
+
 const bot = new discord.Client();
 
 function addMember(user,honor = 0, marks = 0) {

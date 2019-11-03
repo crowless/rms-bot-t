@@ -61,7 +61,7 @@ function removeMember(user) {
     for (let key in a){
         if(a[key]==0) return 'User not found';
     };
-    let b = db.quer(`DELETE FROM users WHERE username = '${user}';`);
+    let b = db.query(`DELETE FROM users WHERE username = '${user}';`);
     return `**${user}** was successfully removed from the list.`;
 }
 function addHonor(user,honor) {

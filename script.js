@@ -18,7 +18,7 @@ function addMember(user,honor = 0, marks = 0) {
     const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
     let a = db.query(quer);
     for (let key in a){
-        if(key==1) return 'User already exists';
+        if(a[key]==1) return 'User already exists';
     };
     let ab = db.query(`INSERT INTO users(username, honor, marks) values('${user}',${honor},${marks})`);
     return `Added **${user}** to the list.`;
@@ -27,7 +27,7 @@ function getData(user, ab = false) {
     const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
     let a = db.query(quer);
     for (let key in a){
-        if(key==0) return 'User not found';
+        if(a[key]==0) return 'User not found';
     };
     let b = db.query(`SELECT * FROM users WHERE username = '${user}'`);
     let gothonor;
@@ -59,7 +59,7 @@ function removeMember(user) {
     const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
     let a = db.query(quer);
     for (let key in a){
-        if(key==0) return 'User not found';
+        if(a[key]==0) return 'User not found';
     };
     let b = db.quer(`DELETE FROM users WHERE username = '${user}';`);
     return `**${user}** was successfully removed from the list.`;
@@ -70,7 +70,7 @@ function addHonor(user,honor) {
     const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
     let a = db.query(quer);
     for (let key in a){
-        if(key==0) return 'User not found';
+        if(a[key]==0) return 'User not found';
     };
     let [gothonor,marks] = getData(user);
     let sumn = parseInt(honor,10);
@@ -83,7 +83,7 @@ function removeHonor(user,honor) {
     const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
     let a = db.query(quer);
     for (let key in a){
-        if(key==0) return 'User not found';
+        if(a[key]==0) return 'User not found';
     };
     let [gothonor,marks] = getData(user);
     let sumn = parseInt(honor,10);
@@ -95,7 +95,7 @@ function markMember(user) {
     const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
     let a = db.query(quer);
     for (let key in a){
-        if(key==0) return 'User not found';
+        if(a[key]==0) return 'User not found';
     };
     let [honor,marks] = getData(user);
     let newmark = marks + 1;
@@ -106,7 +106,7 @@ function removeMark(user) {
     const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
     let a = db.query(quer);
     for (let key in a){
-        if(key==0) return 'User not found';
+        if(a[key]==0) return 'User not found';
     };
     let [honor,marks] = getData(user);
     let newmark = marks - 1;

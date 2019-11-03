@@ -141,6 +141,7 @@ function removeMark(user) {
 
 bot.on('ready', () => {  
     console.log("Bot online.");
+    bot.user.setActivity('RMS :eyes:', { type: 'WATCHING' });
 })
 
 bot.on('message', msg => {

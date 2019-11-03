@@ -45,7 +45,7 @@ function getAllData() {
     let placeholder = [];
         const quer = "SELECT * FROM users";
         let res = db.query(quer);
-        Object.keys(b).forEach(key=>{
+        Object.keys(res).forEach(key=>{
             let tempholder = {};
             tempholder.member = {};
             tempholder.member.name = res[key].username

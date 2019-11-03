@@ -119,8 +119,8 @@ bot.on('ready', () => {
 })
 
 bot.on('message', msg => {
+    if(msg.content.startsWith('.') === false) {return};
     if(!msg.member.roles.find("name","bot access")) return;
-    if(msg.content.startsWith('.') === false) {console.log("A")} else if(msg.content.startsWith('.') === true) {console.log("B")};
 
     let msgar = (msg.content).split(" ");
     let cmd = msgar[0];

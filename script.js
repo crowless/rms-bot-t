@@ -2,7 +2,6 @@ const discord = require('discord.js');
 const smysql = require("sync-mysql");
 const config = require("./config.json");
 let token = process.env.token;
-const tok1 = "NjM3NjU5NDU1MjczNjk3Mjgw.Xb9Ekw.Bp5cMtICmwPJFe3CZ09XmGckgl4";
 
 const db = new smysql({
     host : 'us-cdbr-iron-east-05.cleardb.net',
@@ -242,4 +241,4 @@ bot.on('message', msg => {
         msg.channel.send({embed: helpembed});
     }
 })
-bot.login(tok1);
+bot.login(token);

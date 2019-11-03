@@ -20,7 +20,7 @@ function addMember(user,honor = 0, marks = 0) {
     for (let key in a){
         if(key==1) return 'User already exists';
     };
-    let ab = db.query(`INSERT INTO users(username, honor, marks) values(${user},${honor},${marks})`);
+    let ab = db.query(`INSERT INTO users(username, honor, marks) values('${user}',${honor},${marks})`);
     return `Added **${user}** to the list.`;
 }
 function getData(user, ab = false) {
@@ -66,6 +66,7 @@ function removeMember(user) {
 }
 function addHonor(user,honor) {
     if(isNaN(honor) == true) return "Please enter a number.";
+    console.log(`addhonor user: |${user}| and ${typeof user}`);
     const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
     let a = db.query(quer);
     for (let key in a){
@@ -74,7 +75,7 @@ function addHonor(user,honor) {
     let [gothonor,marks] = getData(user);
     let sumn = parseInt(honor,10);
     let newhonors = gothonor + sumn;
-    let ab = db.query(`UPDATE users SET honor = ${newhonors} WHERE username = ${user};`);
+    let ab = db.query(`UPDATE users SET honor = ${newhonors} WHERE username = '${user}';`);
     return `Successfully added ${honor} honor. Current honor: ${newhonors}`;
 }
 function removeHonor(user,honor) {

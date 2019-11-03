@@ -1,27 +1,34 @@
 const discord = require('discord.js');
-const fs = require('fs');
-const config = require("./config.json")
+const smysql = require("sync-mysql");
+const config = require("./config.json");
 let token = process.env.token;
 
 const bot = new discord.Client();
 
-function setUp() {
-    if(fs.existsSync('./members')) return "Already exists.";
-    fs.mkdirSync('./members');
-}
 function addMember(user,honor = 0, marks = 0) {
-    if(fs.existsSync(`./members/${user}.txt`)) return "User already exists.";
     if(isNaN(honor) == true) return "Please enter a number.";
     if(isNaN(marks) == true) return "Please enter a number.";
-    fs.writeFileSync(`./members/${user}.txt`, `${honor},${marks}`);
+    const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
+    let a = db.query(quer);
+    for (let key in a){
+        if(key==1) return 'User already exists';
+    };
+    let ab = db.query(`INSERT INTO users(username, honor, marks) values(${user},${honor},${marks})`);
     return `Added **${user}** to the list.`;
 }
 function getData(user, a = false) {
-    if(!fs.existsSync(`./members/${user}.txt`)) return "User not found.";
-    let files = fs.readFileSync(`./members/${user}.txt`, "utf8");
-    let newf = files.split(',');
-    let gothonor = newf[0];
-    let marks = newf[1];
+    const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
+    let a = db.query(quer);
+    for (let key in a){
+        if(key==0) return 'User not found';
+    };
+    let b = db.query(`SELECT * FROM users WHERE username = '${user}'`);
+    let gothonor;
+    let marks;
+    Object.keys(b).forEach(key=>{
+        gothonor = b[key].honor;
+        marks = b[key].marks;
+    });
     if(a==true) {
         return `${user} has ${gothonor} honor and ${marks} marks.`;
     }
@@ -29,67 +36,78 @@ function getData(user, a = false) {
 }
 function getAllData() {
     let placeholder = [];
-    let data = fs.readdirSync("./members").forEach(val => {
-        let tempholder = {};
-        tempholder.member = {};
-        tempholder.member.name = val.split('.')[0];
-        [honor,marks] = getData(tempholder.member.name);
-        tempholder.member.honor = parseInt(honor,10);
-        tempholder.member.marks = parseInt(marks,10);
-        placeholder.push(tempholder);
-    })
+        const quer = "SELECT * FROM users";
+        let res = db.query(quer);
+        Object.keys(b).forEach(key=>{
+            let tempholder = {};
+            tempholder.member = {};
+            tempholder.member.name = res[key].username
+            tempholder.member.honor = res[key].honor
+            tempholder.member.marks = res[key].marks
+            placeholder.push(tempholder);
+        });
     return placeholder;
 }
 function removeMember(user) {
-    if(!fs.existsSync(`./members/${user}.txt`)) return "User not found.";
-    fs.unlinkSync(`./members/${user}.txt`);
-    return `**${user}** was successfully removed from the list.`
+    const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
+    let a = db.query(quer);
+    for (let key in a){
+        if(key==0) return 'User not found';
+    };
+    let b = db.quer(`DELETE FROM users WHERE username = '${user}';`);
+    return `**${user}** was successfully removed from the list.`;
 }
 function addHonor(user,honor) {
-    if(!fs.existsSync(`./members/${user}.txt`)) return "User not found.";
     if(isNaN(honor) == true) return "Please enter a number.";
+    const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
+    let a = db.query(quer);
+    for (let key in a){
+        if(key==0) return 'User not found';
+    };
     let [gothonor,marks] = getData(user);
-    let a = parseInt(gothonor,10);
-    let b = parseInt(honor,10);
-    let newhonors = a + b;
-    let newmarks = parseInt(marks,10);
-    fs.writeFileSync(`./members/${user}.txt`, `${newhonors},${newmarks}`)
+    let sumn = parseInt(honor,10);
+    let newhonors = gothonor + sumn;
+    let ab = db.query(`UPDATE users SET honor = ${newhonors} WHERE username = ${user};`);
     return `Successfully added ${honor} honor. Current honor: ${newhonors}`;
 }
 function removeHonor(user,honor) {
-    if(!fs.existsSync(`./members/${user}.txt`)) return "User not found.";
     if(isNaN(honor) == true) return "Please enter a number.";
+    const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
+    let a = db.query(quer);
+    for (let key in a){
+        if(key==0) return 'User not found';
+    };
     let [gothonor,marks] = getData(user);
-    let a = parseInt(gothonor,10);
-    let b = parseInt(honor,10);
-    let newhonors = a - b;
-    let newmarks = parseInt(marks,10);
-    fs.writeFileSync(`./members/${user}.txt`, `${newhonors},${newmarks}`)
+    let sumn = parseInt(honor,10);
+    let newhonors = gothonor - sumn;
+    let ab = db.query(`UPDATE users SET honor = ${newhonors} WHERE username = '${user}';`);
     return `Successfully removed ${honor} honor. Current honor: ${newhonors}`;
 }
 function markMember(user) {
-    if(!fs.existsSync(`./members/${user}.txt`)) return "User not found.";
+    const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
+    let a = db.query(quer);
+    for (let key in a){
+        if(key==0) return 'User not found';
+    };
     let [honor,marks] = getData(user);
-    let newmarks = parseInt(marks,10);
-    let newmark = newmarks + 1;
-    let newhonor = parseInt(honor,10);
-    fs.writeFileSync(`./members/${user}.txt`, `${newhonor},${newmark}`)
+    let newmark = marks + 1;
+    let b = db.query(`UPDATE users SET marks = ${newmark} WHERE username = '${user}'`);
     return `Successfully marked **${user}**.`;
 }
 function removeMark(user) {
-    if(!fs.existsSync(`./members/${user}.txt`)) return "User not found.";
-    let [honor,mark] = getData(user);
-    let newmarks = parseInt(mark,10);
-    let newmark = newmarks - 1;
-    let newhonor = parseInt(honor,10);
-    fs.writeFileSync(`./members/${user}.txt`, `${newhonor},${newmark}`);
+    const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
+    let a = db.query(quer);
+    for (let key in a){
+        if(key==0) return 'User not found';
+    };
+    let [honor,marks] = getData(user);
+    let newmark = marks - 1;
+    let b = db.query(`UPDATE users SET marks = ${newmark} WHERE username = '${user}'`);
     return `Successfully removed a mark from **${user}**.`;
 }
 
-bot.on('ready', () => {
-    let r = setUp();
-    if(r) console.log(r);
-    console.log("Bot online.")
+bot.on('ready', () => {  
+    console.log("Bot online.");
 })
 
 bot.on('message', msg => {

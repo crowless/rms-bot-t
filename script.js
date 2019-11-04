@@ -47,6 +47,52 @@ function getData(user, ab = false) {
     }
     return [gothonor,marks];
 }
+function calculatePagesReq() {
+    let placeholder = getAllData();
+    let lastIndex = [0];
+    let done = false;
+    let required = 1;
+    let tstr = "";
+    let a;
+    let newstrings = [];
+    while (done == false) {
+        if(a == placeholder.length-1) break;
+        for(let ind = 0; ind < placeholder.length; ind++) { 
+            a = ind;
+            if(ind <= lastIndex[lastIndex.length-1] && required != 1) {
+                continue;
+            }
+            let ab = "";
+            let b = ab.concat(tstr,`**${placeholder[ind].member.name}** - Honor: ${placeholder[ind].member.honor} | Marks: ${placeholder[ind].member.marks}\n`);
+            if(b.length>=(1024*required)) {
+                required = required + 1;
+                lastIndex.push(ind);
+                newstrings.push(tstr);
+                break;
+            };
+            tstr += `**${placeholder[ind].member.name}** - Honor: ${placeholder[ind].member.honor} | Marks: ${placeholder[ind].member.marks}\n`;
+        };
+    }
+    newstrings.forEach((val, ind) => {
+        if(ind==0) return;
+        let b = val.replace(newstrings[ind-1],"");
+        newstrings[ind] = b;
+    })
+    let abg = "";
+    for(let ind=lastIndex[lastIndex.length-1]; ind<placeholder.length; ind++) {
+        abg += `**${placeholder[ind].member.name}** - Honor: ${placeholder[ind].member.honor} | Marks: ${placeholder[ind].member.marks}\n`;
+    }
+    newstrings.push(abg);
+    return [required, lastIndex, newstrings];
+};
+
+function returnStringVal(page) { 
+    if(page == 0) return;
+    let [required, lastIndex, newstrings] = calculatePagesReq();
+    if(page > required) return;
+    let STS = newstrings[page-1];
+    return STS;
+};
 function getAllData() {
     let placeholder = [];
         const quer = "SELECT * FROM users";
@@ -198,22 +244,20 @@ bot.on('message', msg => {
         msg.channel.send(info);
         console.log(info);
     } else if(cmd===`${config.prefix}getlist`) {
-        console.log("called getwholelist");
-        let placehold = getAllData();
-        const honorembed = new discord.RichEmbed()
-        .setColor('#0067c2')
-        .setAuthor('RMS Bot', bot.user.displayAvatarURL)
-        .setTitle('**Honor list**')
-        .setDescription('Entire list for all of the honors.')
-        .setTimestamp()
-        .setFooter('Honor list', bot.user.displayAvatarURL);
-        let strink = "";
-        placehold.forEach(v => {
-            console.log(`${v.member.name}, ${v.member.honor}, ${v.member.marks}`);
-            strink += `**${v.member.name}** - Honor: ${v.member.honor} | Marks: ${v.member.marks}\n`;
-        });
-        honorembed.addField("**List of honor**", strink);
-        msg.channel.send({embed: honorembed});
+        let page = 1;
+        if(args[0]) {
+            page = args[0];
+        };
+            console.log("called getwholelist");
+            const honorembed = new discord.RichEmbed()
+            .setColor('#0067c2')
+            .setAuthor('RMS Bot', bot.user.displayAvatarURL)
+            .setTitle('**Honor list**')
+            .setDescription('Entire list for all of the honors.')
+            .setTimestamp()
+            .setFooter(`Honor list page ${page}`, bot.user.displayAvatarURL)
+            .addField("**List of honor**", returnStringVal(page));
+            msg.channel.send({embed: honorembed});
     } else if(cmd===`${config.prefix}link`) {
         let linkembed = new discord.RichEmbed()
         .setColor('#0067c2')
@@ -238,14 +282,14 @@ bot.on('message', msg => {
         .addField("**addmember**", "Adds given member to the list (name is case sensitive)\n`.addmember [member name] [honor amount] [marks amount]`")
         .addField("**removemember**", "Removes a member from the honor list\n`.removemember [member name (case sensitive)]`")
         .addField("**link**", "Gives you the links of all the important documents\n`.link`")
-        .addField("**getlist**", "Displays whole honor list\n`.getlist`")
-        .addField("**bulkaddhonor**", "Adds honor to a given members\n`.bulkaddhonor [member name1, member name 2 etc.] [honor amount]`")
+        .addField("**getlist**", "Displays whole honor list\n`.getlist [page]`")
+        .addField("**bulkaddhonor**", "Adds honor to a given members (don't use spaces when entering names)\n`.bulkaddhonor [member name1, member name 2 etc.] [honor amount]`")
         .setTimestamp()
         .setFooter('List of commands', bot.user.displayAvatarURL);
 
         msg.channel.send({embed: helpembed});
     } else if(cmd===`${config.prefix}bulkaddhonor`) {
-        const users = args[0];
+        const users = args[0].trim();
         const givenHonor = args[1];
         let usrs = users.split(',').forEach(val => {
             addHonor(val, givenHonor);

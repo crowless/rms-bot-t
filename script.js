@@ -239,23 +239,18 @@ bot.on('message', msg => {
         .addField("**removemember**", "Removes a member from the honor list\n`.removemember [member name (case sensitive)]`")
         .addField("**link**", "Gives you the links of all the important documents\n`.link`")
         .addField("**getlist**", "Displays whole honor list\n`.getlist`")
+        .addField("**bulkaddhonor**", "Adds honor to a given members\n`.bulkaddhonor [member name1, member name 2 etc.] [honor amount]`")
         .setTimestamp()
         .setFooter('List of commands', bot.user.displayAvatarURL);
 
         msg.channel.send({embed: helpembed});
     } else if(cmd===`${config.prefix}bulkaddhonor`) {
-        let tempholder = [];
-        const ctr = args.length;
-        args.forEach(val => {
-            addHonor(val, args(ctr - 1));
-            let stringk = "";
-            for(let i = 0; i < ctr-1; i++) {
-                stringk += `**${args[i]}** ,`;
-            }
-            stringk.substr(0,stringk.length - 2);
-            msg.channel.send(`Successfully added honor to ${stringk}`);
+        const users = args[0];
+        const givenHonor = args[1];
+        let usrs = users.split(',').forEach(val => {
+            addHonor(val, givenHonor);
         })
-
+        msg.channel.send(`Successfully added honor to members: **${users}**. :white_check_mark:`);
     }
 })
 bot.login(token);

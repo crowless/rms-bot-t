@@ -207,9 +207,11 @@ bot.on('message', msg => {
         .setDescription('Entire list for all of the honors.')
         .setTimestamp()
         .setFooter('Honor list', bot.user.displayAvatarURL);
+        let strink = "";
         placehold.forEach(v => {
-            honorembed.addField(v.member.name, `Honors: **${v.member.honor}** | Marks: **${v.member.marks}**`);
+            strink.concat(`**${v.member.name}** - Honor: ${v.member.honor} | Marks: ${v.member.marks}\n`);
         })
+        honorembed.addField("**List of honor**", strink);
         msg.channel.send({embed: honorembed});
     } else if(cmd===`${config.prefix}link`) {
         let linkembed = new discord.RichEmbed()

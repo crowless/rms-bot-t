@@ -209,8 +209,9 @@ bot.on('message', msg => {
         .setFooter('Honor list', bot.user.displayAvatarURL);
         let strink = "";
         placehold.forEach(v => {
-            strink.concat(`**${v.member.name}** - Honor: ${v.member.honor} | Marks: ${v.member.marks}\n`);
-        })
+            console.log(`${v.member.name}, ${v.member.honor}, ${v.member.marks}`);
+            strink += `**${v.member.name}** - Honor: ${v.member.honor} | Marks: ${v.member.marks}\n`;
+        });
         honorembed.addField("**List of honor**", strink);
         msg.channel.send({embed: honorembed});
     } else if(cmd===`${config.prefix}link`) {

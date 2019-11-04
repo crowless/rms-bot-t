@@ -19,7 +19,7 @@ function addMember(user,honor = 0, marks = 0) {
     let a = db.query(quer);
     a.forEach(ind => {
         Object.keys(ind).forEach(key=> {
-            if(ind[key] == 1) return "User already exists. :x:";
+            if(ind[key] == 1) return `User **${user}** already exists. :x:`;
         }); 
     });
     let ab = db.query(`INSERT INTO users(username, honor, marks) values('${user}',${honor},${marks})`);
@@ -34,7 +34,7 @@ function getData(user, ab = false) {
             if(ind[key] == 0) d = 1;
         }); 
     });
-    if(d==1) return 'User not found. :x:';
+    if(d==1) return `User **${user}** not found. :x:`;
     let b = db.query(`SELECT * FROM users WHERE username = '${user}'`);
     let gothonor;
     let marks;
@@ -70,7 +70,7 @@ function removeMember(user) {
             if(ind[key] == 0) d = 1;
         }); 
     });
-    if(d==1) return 'User not found. :x:';
+    if(d==1) return `User **${user}** not found. :x:`;
     let b = db.query(`DELETE FROM users WHERE username = '${user}';`);
     return `**${user}** was successfully removed from the list. :white_check_mark:`;
 }
@@ -84,7 +84,7 @@ function addHonor(user,honor) {
             if(ind[key] == 0) d = 1;
         }); 
     });
-    if(d==1) return 'User not found. :x:';
+    if(d==1) return `User **${user}** not found. :x:`;
     let [gothonor,marks] = getData(user);
     let sumn = parseInt(honor,10);
     let newhonors = gothonor + sumn;
@@ -101,7 +101,7 @@ function removeHonor(user,honor) {
             if(ind[key] == 0) d = 1;
         }); 
     });
-    if(d==1) return 'User not found. :x:';
+    if(d==1) return `User **${user}** not found. :x:`;
     let [gothonor,marks] = getData(user);
     let sumn = parseInt(honor,10);
     let newhonors = gothonor - sumn;
@@ -117,7 +117,7 @@ function markMember(user) {
             if(ind[key] == 0) d = 1;
         }); 
     });
-    if(d==1) return 'User not found. :x:';
+    if(d==1) return `User **${user}** not found. :x:`;
     let [honor,marks] = getData(user);
     let newmark = marks + 1;
     let b = db.query(`UPDATE users SET marks = ${newmark} WHERE username = '${user}'`);
@@ -132,7 +132,7 @@ function removeMark(user) {
             if(ind[key] == 0) d = 1;
         }); 
     });
-    if(d==1) return 'User not found. :x:';
+    if(d==1) return `User **${user}** not found. :x:`;
     let [honor,marks] = getData(user);
     let newmark = marks - 1;
     let b = db.query(`UPDATE users SET marks = ${newmark} WHERE username = '${user}'`);
@@ -243,6 +243,19 @@ bot.on('message', msg => {
         .setFooter('List of commands', bot.user.displayAvatarURL);
 
         msg.channel.send({embed: helpembed});
+    } else if(cmd===`${config.prefix}bulkaddhonor`) {
+        let tempholder = [];
+        const ctr = args.length;
+        args.forEach(val => {
+            addHonor(val, args(ctr - 1));
+            let stringk = "";
+            for(let i = 0; i < ctr-1; i++) {
+                stringk += `**${args[i]}** ,`;
+            }
+            stringk.substr(0,stringk.length - 2);
+            msg.channel.send(`Successfully added honor to ${stringk}`);
+        })
+
     }
 })
 bot.login(token);

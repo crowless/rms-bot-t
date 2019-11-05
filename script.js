@@ -17,11 +17,13 @@ function addMember(user,honor = 0, marks = 0) {
     if(isNaN(marks) == true) return "Please enter a number.";
     const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
     let a = db.query(quer);
+    let d = 0;
     a.forEach(ind => {
         Object.keys(ind).forEach(key=> {
-            if(ind[key] == 1) return `User **${user}** already exists. :x:`;
+            if(ind[key] == 1) d = 1;
         }); 
     });
+    if(d==1) return `User **${user}** already exists. :x:`;
     let ab = db.query(`INSERT INTO users(username, honor, marks) values('${user}',${honor},${marks})`);
     return `Added **${user}** to the list.`;
 }
@@ -47,52 +49,43 @@ function getData(user, ab = false) {
     }
     return [gothonor,marks];
 }
-function calculatePagesReq() {
-    let placeholder = getAllData();
-    let lastIndex = [0];
-    let done = false;
+function divideInPages(page) {
     let required = 1;
+    let lastIndex = [0];
     let tstr = "";
+    let newString = [];
+    let placeholder = getAllData();
     let a;
-    let newstrings = [];
-    while (done == false) {
-        if(a == placeholder.length-1) break;
-        for(let ind = 0; ind < placeholder.length; ind++) { 
-            a = ind;
-            if(ind <= lastIndex[lastIndex.length-1] && required != 1) {
-                continue;
-            }
-            let ab = "";
-            let b = ab.concat(tstr,`**${placeholder[ind].member.name}** - Honor: ${placeholder[ind].member.honor} | Marks: ${placeholder[ind].member.marks}\n`);
-            if(b.length>=(1024*required)) {
-                required = required + 1;
-                lastIndex.push(ind);
-                newstrings.push(tstr);
+    while (true) {
+        for(let i = lastIndex[lastIndex.length-1]; i<placeholder.length; i++) { //save current index
+            a = i;
+            if(tstr.length>1024) {
+                let newtstr = tstr.replace(`**${placeholder[i-1].member.name}** - Honor: ${placeholder[i-1].member.honor} | Marks: ${placeholder[i-1].member.marks}\n`,"");
+                lastIndex.push(i);
+                required += 1;
+                newString.push(newtstr);
+                console.log(`Pushed at Ind: |${lastIndex[lastIndex.length-1]}| Req: |${required}| newTstrLen: |${newtstr.length}|`);
+                tstr = "";
                 break;
-            };
-            tstr += `**${placeholder[ind].member.name}** - Honor: ${placeholder[ind].member.honor} | Marks: ${placeholder[ind].member.marks}\n`;
+            }
+            tstr += `**${placeholder[i].member.name}** - Honor: ${placeholder[i].member.honor} | Marks: ${placeholder[i].member.marks}\n`;
+            if(i==placeholder.length-1) {
+                lastIndex.push(i);
+                required += 1;
+                newString.push(tstr);
+                console.log(`Pushed at Ind: |${lastIndex[lastIndex.length-1]}| Req: |${required}| newTstrLen: |${tstr.length}|`);
+            }
+        }
+        if(a==placeholder.length-1) {
+            console.log(`LAST-INDEX: |${a}|`);
+            break;
         };
     }
-    newstrings.forEach((val, ind) => {
-        if(ind==0) return;
-        let b = val.replace(newstrings[ind-1],"");
-        newstrings[ind] = b;
-    })
-    let abg = "";
-    for(let ind=lastIndex[lastIndex.length-1]; ind<placeholder.length; ind++) {
-        abg += `**${placeholder[ind].member.name}** - Honor: ${placeholder[ind].member.honor} | Marks: ${placeholder[ind].member.marks}\n`;
-    }
-    newstrings.push(abg);
-    return [required, lastIndex, newstrings];
-};
-
-function returnStringVal(page) { 
-    if(page == 0) return;
-    let [required, lastIndex, newstrings] = calculatePagesReq();
-    if(page > required) return;
-    let STS = newstrings[page-1];
-    return STS;
-};
+    if(page>required-1) return "PDE";
+    console.log(placeholder.length);
+    newString.forEach(val => console.log(val.length));
+    return [newString[page-1]];
+}
 function getAllData() {
     let placeholder = [];
         const quer = "SELECT * FROM users";
@@ -191,6 +184,7 @@ bot.on('ready', () => {
 })
 
 bot.on('message', msg => {
+    if(msg.guild === null) return;
     if(msg.content.startsWith('.') === false) {return};
     if(!msg.member.roles.find("name","bot access")) return;
 
@@ -198,8 +192,8 @@ bot.on('message', msg => {
     let cmd = msgar[0];
     let args = msgar.slice(1);
 
-    if(cmd===`${config.prefix}checkhonor`) {
-        console.log("called checkhonor");
+    if(cmd===`${config.prefix}checkstats`) {
+        console.log("called checkstats");
         let user = args[0];
         let info = getData(user, true);
         msg.channel.send(info);
@@ -256,7 +250,7 @@ bot.on('message', msg => {
             .setDescription('Entire list for all of the honors.')
             .setTimestamp()
             .setFooter(`Honor list page ${page}`, bot.user.displayAvatarURL)
-            .addField("**List of honor**", returnStringVal(page));
+            .addField("**List of honor**", divideInPages(page));
             msg.channel.send({embed: honorembed});
     } else if(cmd===`${config.prefix}link`) {
         let linkembed = new discord.RichEmbed()
@@ -295,6 +289,12 @@ bot.on('message', msg => {
             addHonor(val, givenHonor);
         })
         msg.channel.send(`Successfully added honor to members: **${users}**. :white_check_mark:`);
+    } else if(cmd===`${config.prefix}bulkmark`) {
+        const users = args[0].trim();
+        let usrs = users.split(',').forEach(val => {
+            markMember(val);
+        })
+        msg.channel.send(`Successfully marked members: **${users}**. :white_check_mark:`);
     }
 })
 bot.login(token);

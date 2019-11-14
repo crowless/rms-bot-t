@@ -1,7 +1,7 @@
 const discord = require('discord.js');
 const smysql = require("sync-mysql");
 const config = require("./config.json");
-let token = "NjM3NjU5NDU1MjczNjk3Mjgw.XccVVQ.XOgGjSQHmT54sMgflj5kB5Xonik";
+let token = process.env.token;
 
 const db = new smysql({
     host : 'us-cdbr-iron-east-05.cleardb.net',

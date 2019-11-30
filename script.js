@@ -12,20 +12,20 @@ const db = new smysql({
 
 const bot = new discord.Client();
 
-function addMember(user,honor = 0, marks = 0) {
-    if(isNaN(honor) == true) return "Please enter a number.";
-    if(isNaN(marks) == true) return "Please enter a number.";
-    const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
-    let a = db.query(quer);
-    let d = 0;
-    a.forEach(ind => {
-        Object.keys(ind).forEach(key=> {
-            if(ind[key] == 1) d = 1;
-        }); 
-    });
-    if(d==1) return `User **${user}** already exists. :x:`;
-    let whole = getRank(0,true);
-    let rank = 1;
+function addMember(user,honor = 0, marks = 0) {what
+    if(isNaN(honor) == true) return "Please entwhater a number.";
+    if(isNaN(marks) == true) return "Please entwhater a number.";
+    const quer = `SELECT EXISTS( SELECT * FROM whatusers WHERE username = '${user}');`;
+    let a = db.query(quer);what
+    let d = 0;what
+    a.forEach(ind => {what
+        Object.keys(ind).forEach(key=> {what
+            if(ind[key] == 1) d = 1;what
+        }); what
+    });what
+    if(d==1) return `User **${user}** already ewhatxists. :x:`;
+    let whole = getRank(0,true);what
+    let rank = 1;what
     for(let i=0;i<whole.length;i++) {
         if(honor >= whole[i].minHonor) {
             rank = whole[i].id;
@@ -432,12 +432,26 @@ bot.on('ready', () => {
 bot.on('message', msg => {
     if(msg.guild === null) return;
     if(msg.content.startsWith('.') === false) {return};
-    if(!msg.member.roles.find("name","bot access")) return;
-
     let msgar = (msg.content).split(" ");
     let cmd = msgar[0];
     let args = msgar.slice(1);
-
+    //== Part of commands that everyone can use
+    if(cmd===`${config.prefix}mystats`) {
+        let info = getData(msg.author.username, true);
+        msg.channel.send(info);
+    } else if(cmd===`${config.prefix}link`) {
+        let linkembed = new discord.RichEmbed()
+        .setColor('#0067c2')
+        .setAuthor('Important links')
+        .setDescription('All of the important document links.')
+        .addField('**Protocol**',"[Click here to get access to the protocol](https://docs.google.com/document/d/1ANmv4rpq9MG6nk-G-RJO8qG3BtgSY-YsIenHSepB9uA/edit)")
+        .addField('**HR Protocol**',"[Click here to get access to the HR protocol](https://docs.google.com/document/d/1s7D3ej2sq_qOp6ihrcL2GgKP9Ggq-WoU3FIQX8Kn3LQ/edit)")
+        .setTimestamp()
+        .setFooter("Links list", bot.user.displayAvatarURL);
+        msg.channel.send({embed: linkembed});
+    }   
+    if(!msg.member.roles.find("name","bot access")) return;
+    //== Bot managing commands
     if(cmd===`${config.prefix}checkstats`) {
         console.log("called checkstats");
         let user = args[0];
@@ -498,17 +512,6 @@ bot.on('message', msg => {
             .setFooter(`Honor list page ${page}`, bot.user.displayAvatarURL)
             .addField("**List of honor**", divideInPages(page));
             msg.channel.send({embed: honorembed});
-    } else if(cmd===`${config.prefix}link`) {
-        let linkembed = new discord.RichEmbed()
-        .setColor('#0067c2')
-        .setAuthor('Important links')
-        .setDescription('All of the important document links.')
-        .addField('**Protocol**',"[Click here to get access to the protocol](https://docs.google.com/document/d/1ANmv4rpq9MG6nk-G-RJO8qG3BtgSY-YsIenHSepB9uA/edit)")
-        .addField('**HR Protocol**',"[Click here to get access to the HR protocol](https://docs.google.com/document/d/1s7D3ej2sq_qOp6ihrcL2GgKP9Ggq-WoU3FIQX8Kn3LQ/edit)")
-        .setTimestamp()
-        .setFooter("Links list", bot.user.displayAvatarURL);
-        msg.channel.send({embed: linkembed});
-        
     } else if(cmd===`${config.prefix}help`) {
         const helpembed = new discord.RichEmbed()
         .setColor('#0067c2')
@@ -528,6 +531,7 @@ bot.on('message', msg => {
         .addField("**setchanges**", "Sets all rank changes listed in `ranklist`\n`.setchanges`")
         .addField("**changerank**", "Forcibly changes members rank and sets their honor to the honor required to get given rank\n`.changerank [member name] [rank (case sensitive)]`")
         .addField("**sethonor**", "Sets given members honor to given amount\n`.sethonor [member name] [amount of honor]`")
+        .addField("**mystats**", "Shows you your stats according to your username.\n`.mystats`")
         .setTimestamp()
         .setFooter('List of commands', bot.user.displayAvatarURL);
 
@@ -574,6 +578,26 @@ bot.on('message', msg => {
         console.log(args[1]);
         let mes = changeRank(args[0], args[1]);
         msg.channel.send(mes);
+    } else if(cmd==`${config.prefix}sethonor`) {
+        let user = args[0];
+        let honor = args[1];
+        let info = setHonor(user,honor);
+        msg.channel.send(info);
+    } else if(cmd==`${config.prefix}updaterank`) {
+        let user = args[0]
+        if(args.length > 2) {
+            let holder = "";
+            for(let i=0;i<args.length;i++) {
+                if(i==0) return;
+                if(i==1) holder += val;
+                holder += ` ${val}`;
+            }
+            console.log(holder);
+            let mes = changeRank(user, holder);
+        }
+        neutralize(user);
+        msg.channel.send(`**${user}**'s rank has been updated. :white_check_mark:`);
     }
+
 })
 bot.login(token);

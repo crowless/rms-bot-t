@@ -459,7 +459,8 @@ bot.on('message', msg => {
     let args = msgar.slice(1);
     //== Part of commands that everyone can use
     if(cmd===`${config.prefix}mystats`) {
-        let info = getData(msg.author.username, true);
+        let member = msg.guild.member(msg.author)
+        let info = getData(member.displayName, true);
         msg.channel.send(info);
     } else if(cmd===`${config.prefix}link`) {
         let linkembed = new discord.RichEmbed()

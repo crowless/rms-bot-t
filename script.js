@@ -12,20 +12,20 @@ const db = new smysql({
 
 const bot = new discord.Client();
 
-function addMember(user,honor = 0, marks = 0) {what
-    if(isNaN(honor) == true) return "Please entwhater a number.";
-    if(isNaN(marks) == true) return "Please entwhater a number.";
-    const quer = `SELECT EXISTS( SELECT * FROM whatusers WHERE username = '${user}');`;
-    let a = db.query(quer);what
-    let d = 0;what
-    a.forEach(ind => {what
-        Object.keys(ind).forEach(key=> {what
-            if(ind[key] == 1) d = 1;what
-        }); what
-    });what
-    if(d==1) return `User **${user}** already ewhatxists. :x:`;
-    let whole = getRank(0,true);what
-    let rank = 1;what
+function addMember(user,honor = 0, marks = 0) {
+    if(isNaN(honor) == true) return "Please enter a number.";
+    if(isNaN(marks) == true) return "Please enter a number.";
+    const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
+    let a = db.query(quer);
+    let d = 0;
+    a.forEach(ind => {
+        Object.keys(ind).forEach(key=> {
+            if(ind[key] == 1) d = 1;
+        });
+    });
+    if(d==1) return `User **${user}** already exists. :x:`;
+    let whole = getRank(0,true);
+    let rank = 1;
     for(let i=0;i<whole.length;i++) {
         if(honor >= whole[i].minHonor) {
             rank = whole[i].id;

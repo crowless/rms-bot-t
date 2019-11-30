@@ -315,6 +315,28 @@ function saveChanges() {
     let aex = db.query("DELETE FROM proctobedone;");
     return "Saved all rank changes. :white_check_mark:";
 }
+function singularSave(user) {
+    const check = db.query("SELECT COUNT(*) FROM proctobedone;");
+    let count = 0;
+    let proc = getProc();
+    check.forEach(ind => {
+        Object.keys(ind).forEach(key=> {
+            count = ind[key];
+        }); 
+    });
+    if(proc==51) return "User is not eligible to get their rank changed. :x:";
+    if(count==0) return "User is not eligible to get their rank changed. :x:";
+    let message = "asdf";
+    proc.forEach(val => {
+        if(val.namee == user) {
+            let aes = db.query(`UPDATE users SET rank = ${val.rankk} WHERE username = '${val.namee}';`);
+            message = `**${val.namee}**'s rank has been updated. :white_check_mark:`;
+        }
+    })
+    if(message=="asdf") return "User is not eligible to get their rank changed. :x:";
+    neutralize(user);
+    return message;
+}
 function removeMember(user) {
     const quer = `SELECT EXISTS( SELECT * FROM users WHERE username = '${user}');`;
     let a = db.query(quer);
@@ -531,6 +553,7 @@ bot.on('message', msg => {
         .addField("**setchanges**", "Sets all rank changes listed in `ranklist`\n`.setchanges`")
         .addField("**changerank**", "Forcibly changes members rank and sets their honor to the honor required to get given rank\n`.changerank [member name] [rank (case sensitive)]`")
         .addField("**sethonor**", "Sets given members honor to given amount\n`.sethonor [member name] [amount of honor]`")
+        .addField("**updaterank**", "Sets the rank changes to only given person\n`.updaterank [member name]`")
         .addField("**mystats**", "Shows you your stats according to your username.\n`.mystats`")
         .setTimestamp()
         .setFooter('List of commands', bot.user.displayAvatarURL);
@@ -584,19 +607,9 @@ bot.on('message', msg => {
         let info = setHonor(user,honor);
         msg.channel.send(info);
     } else if(cmd==`${config.prefix}updaterank`) {
-        let user = args[0]
-        if(args.length > 2) {
-            let holder = "";
-            for(let i=0;i<args.length;i++) {
-                if(i==0) return;
-                if(i==1) holder += val;
-                holder += ` ${val}`;
-            }
-            console.log(holder);
-            let mes = changeRank(user, holder);
-        }
-        neutralize(user);
-        msg.channel.send(`**${user}**'s rank has been updated. :white_check_mark:`);
+        let user = args[0];
+        let info = singularSave(user);
+        msg.channel.send(info);
     }
 
 })

@@ -453,6 +453,14 @@ bot.on('ready', () => {
 
 bot.on('message', msg => {
     if(msg.guild === null) return;
+    if(msg.channel.name == 'asydfa') {
+        if(msg.author.id == '268420131728785409' || msg.author.id == '213501582820507648') {
+            const name = msg.content.split(' ')
+            const guild = bot.guilds.find('name',"Roblox's Myths Security");
+            guild.channels.find('name',name[0]).send(name[1]);
+            return;
+        }
+    }
     if(msg.content.startsWith('.') === false) {return};
     let msgar = (msg.content).split(" ");
     let cmd = msgar[0];

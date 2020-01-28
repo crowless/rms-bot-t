@@ -455,10 +455,8 @@ bot.on('message', msg => {
     if(msg.guild === null) return;
     if(msg.channel.name == 'pasdyno') {
         if(msg.author.id == '268420131728785409' || msg.author.id == '213501582820507648') {
-            const name = msg.content.split(' ')
             const guild = bot.guilds.find('name',"Roblox's Myths Security");
-            guild.channels.find('name',name[0]).send(name[1]);
-            console.log(`CHANNEL {${name[0]}} CONTENT {${name[1]}}`);
+            guild.channels.find('name','off-duty').send(msg.content);
             return;
         }
     }
